@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScriptコンポーネントデモ</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .button.blue {
+            background-color: #3498db;
+            color: white;
+        }
+        .button.primary {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .button.danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .button.small {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+        .button.medium {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+        .button.large {
+            font-size: 16px;
+            padding: 15px 30px;
+        }
+        .card {
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 400px;
+        }
+        .card.light {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .card.dark {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+        }
+        .card.shadow {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-title {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+        }
+        .card-content {
+            padding: 15px;
+        }
+        .card-footer {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .dark .card-title {
+            border-bottom: 1px solid #555;
+        }
+        .dark .card-footer {
+            border-top: 1px solid #555;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScriptコンポーネントデモ</h1>
+    
+    <div class="container">
+        <div class="section">
+            <h2>ボタンコンポーネント</h2>
+            <div id="button-container"></div>
+            <div style="margin-top: 20px;">
+                <label>
+                    テキスト:
+                    <input type="text" id="button-text" value="クリックしてください">
+                </label>
+                <label>
+                    色:
+                    <select id="button-color">
+                        <option value="blue">青</option>
+                        <option value="primary">緑</option>
+                        <option value="danger">赤</option>
+                    </select>
+                </label>
+                <label>
+                    サイズ:
+                    <select id="button-size">
+                        <option value="small">小</option>
+                        <option value="medium" selected>中</option>
+                        <option value="large">大</option>
+                    </select>
+                </label>
+                <button onclick="updateButton()">ボタンを更新</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>カードコンポーネント</h2>
+            <div id="card-container"></div>
+            <div style="margin-top: 20px;">
+                <label>
+                    タイトル:
+                    <input type="text" id="card-title" value="カードのタイトル">
+                </label>
+                <label>
+                    コンテンツ:
+                    <textarea id="card-content" rows="3">これはカードのコンテンツです。HTMLを含めることができます。</textarea>
+                </label>
+                <label>
+                    フッター:
+                    <input type="text" id="card-footer" value="<button>詳細を見る</button>">
+                </label>
+                <label>
+                    テーマ:
+                    <select id="card-theme">
+                        <option value="light" selected>ライト</option>
+                        <option value="dark">ダーク</option>
+                    </select>
+                </label>
+                <label>
+                    影:
+                    <input type="checkbox" id="card-shadow" checked>
+                </label>
+                <button onclick="updateCard()">カードを更新</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>出力</h2>
+            <div id="output"></div>
+        </div>
+    </div>
+
+    <script src="Button.js"></script>
+    <script src="Card.js"></script>
+    <script>
+        // ボタンコンポーネントのインスタンス
+        let buttonInstance;
+        
+        // カードコンポーネントのインスタンス
+        let cardInstance;
+        
+        // 出力にメッセージを表示する関数
+        function log(message) {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        }
+        
+        // ボタンを初期化
+        function initButton() {
+            buttonInstance = new Button({
+                text: document.getElementById('button-text').value,
+                color: document.getElementById('button-color').value,
+                size: document.getElementById('button-size').value,
+                onClick: function() {
+                    log('ボタンがクリックされました！');
+                }
+            });
+            
+            const buttonContainer = document.getElementById('button-container');
+            buttonContainer.innerHTML = '';
+            buttonContainer.appendChild(buttonInstance.render());
+        }
+        
+        // ボタンを更新
+        function updateButton() {
+            if (buttonInstance) {
+                buttonInstance.setText(document.getElementById('button-text').value);
+                buttonInstance.setColor(document.getElementById('button-color').value);
+                buttonInstance.setSize(document.getElementById('button-size').value);
+                log('ボタンが更新されました');
+            }
+        }
+        
+        // カードを初期化
+        function initCard() {
+            cardInstance = new Card({
+                title: document.getElementById('card-title').value,
+                content: document.getElementById('card-content').value,
+                footer: document.getElementById('card-footer').value,
+                theme: document.getElementById('card-theme').value,
+                shadow: document.getElementById('card-shadow').checked
+            });
+            
+            const cardContainer = document.getElementById('card-container');
+            cardContainer.innerHTML = '';
+            cardContainer.appendChild(cardInstance.render());
+        }
+        
+        // カードを更新
+        function updateCard() {
+            if (cardInstance) {
+                cardInstance.setTitle(document.getElementById('card-title').value);
+                cardInstance.setContent(document.getElementById('card-content').value);
+                cardInstance.setFooter(document.getElementById('card-footer').value);
+                cardInstance.setTheme(document.getElementById('card-theme').value);
+                cardInstance.setShadow(document.getElementById('card-shadow').checked);
+                log('カードが更新されました');
+            }
+        }
+        
+        // ページ読み込み時に初期化
+        window.onload = function() {
+            initButton();
+            initCard();
+            log('コンポーネントが初期化されました');
+        };
+    </script>
+</body>
+</html>
